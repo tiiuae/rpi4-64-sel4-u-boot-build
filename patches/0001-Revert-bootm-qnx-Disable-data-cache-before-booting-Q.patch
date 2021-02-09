@@ -1,0 +1,75 @@
+From bdd9dd2c97a5924ef2f8b3f114b24015aa0ae05c Mon Sep 17 00:00:00 2001
+From: Joonas Onatsu <joonas.onatsu@unikie.com>
+Date: Tue, 9 Feb 2021 10:57:08 +0000
+Subject: [PATCH] Revert "bootm: qnx: Disable data cache before booting QNX
+ image"
+
+This reverts commit 995eab8b5b580b67394312b1621c60a71042cd18.
+---
+ cmd/elf.c         | 11 +++++++++++
+ common/bootm_os.c | 12 ------------
+ 2 files changed, 11 insertions(+), 12 deletions(-)
+
+diff --git a/cmd/elf.c b/cmd/elf.c
+index d44b95d903..9465202969 100644
+--- a/cmd/elf.c
++++ b/cmd/elf.c
+@@ -26,12 +26,23 @@ static unsigned long do_bootelf_exec(ulong (*entry)(int, char * const[]),
+ {
+ 	unsigned long ret;
+ 
++	/*
++	 * QNX images require the data cache is disabled.
++	 * Data cache is already flushed, so just turn it off.
++	 */
++	int dcache = dcache_status();
++	if (dcache)
++		dcache_disable();
++
+ 	/*
+ 	 * pass address parameter as argv[0] (aka command name),
+ 	 * and all remaining args
+ 	 */
+ 	ret = entry(argc, argv);
+ 
++	if (dcache)
++		dcache_enable();
++
+ 	return ret;
+ }
+ 
+diff --git a/common/bootm_os.c b/common/bootm_os.c
+index e9aaddf3e6..6deb4353ec 100644
+--- a/common/bootm_os.c
++++ b/common/bootm_os.c
+@@ -385,7 +385,6 @@ static int do_bootm_qnxelf(int flag, int argc, char *const argv[],
+ {
+ 	char *local_args[2];
+ 	char str[16];
+-	int dcache;
+ 
+ 	if (flag != BOOTM_STATE_OS_GO)
+ 		return 0;
+@@ -400,19 +399,8 @@ static int do_bootm_qnxelf(int flag, int argc, char *const argv[],
+ 	sprintf(str, "%lx", images->ep); /* write entry-point into string */
+ 	local_args[0] = argv[0];
+ 	local_args[1] = str;	/* and provide it via the arguments */
+-
+-	/*
+-	 * QNX images require the data cache is disabled.
+-	 */
+-	dcache = dcache_status();
+-	if (dcache)
+-		dcache_disable();
+-
+ 	do_bootelf(NULL, 0, 2, local_args);
+ 
+-	if (dcache)
+-		dcache_enable();
+-
+ 	return 1;
+ }
+ #endif
+-- 
+2.25.1
+
