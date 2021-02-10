@@ -1,3 +1,5 @@
 tools/*.tar.xz filter=lfs diff=lfs merge=lfs -text
-tools/aarch64-elf/*.tar.xz filter=lfs diff=lfs merge=lfs -text
-tools/aarch64-linux-gnu/*.tar.xz filter=lfs diff=lfs merge=lfs -text
+tools/linaro/aarch64-elf/*.tar.xz filter=lfs diff=lfs merge=lfs -text
+tools/linaro/aarch64-linux-gnu/*.tar.xz filter=lfs diff=lfs merge=lfs -text
+tools/arm-gnu-gcc/aarch64-none-elf/*.tar.xz filter=lfs diff=lfs merge=lfs -text
+tools/arm-gnu-gcc/aarch64-none-linux-gnu/*.tar.xz filter=lfs diff=lfs merge=lfs -text
