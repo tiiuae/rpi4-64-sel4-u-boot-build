@@ -1,0 +1,29 @@
+From 51e149a6add34c078684026a70ea946276e135c1 Mon Sep 17 00:00:00 2001
+From: JorgeMVP <jorge@ssrc.tii.ae>
+Date: Mon, 28 Feb 2022 13:16:27 +0400
+Subject: [PATCH] HYPR-372 Launch bootscript after u-boot while giving backward
+ compatibility for sel4_bootcmd
+
+---
+ include/config_distro_bootcmd.h | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/include/config_distro_bootcmd.h b/include/config_distro_bootcmd.h
+index 750e9e04e8..6905d74000 100644
+--- a/include/config_distro_bootcmd.h
++++ b/include/config_distro_bootcmd.h
+@@ -493,9 +493,8 @@
+ 		BOOTENV_SET_NVME_NEED_INIT                                \
+ 		BOOTENV_SET_IDE_NEED_INIT                                 \
+ 		BOOTENV_SET_VIRTIO_NEED_INIT                              \
+-		"for target in ${boot_targets}; do "                      \
+-			"run bootcmd_${target}; "                         \
+-		"done\0"
++		"fatload mmc 0:1 0x7000 boot.scr; source 0x7000;"		\
++		"run sel4_bootcmd;\0"
+ 
+ #ifndef CONFIG_BOOTCOMMAND
+ #define CONFIG_BOOTCOMMAND "run distro_bootcmd"
+-- 
+2.25.1
+
